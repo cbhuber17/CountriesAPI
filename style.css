@@ -41,7 +41,7 @@ body {
   font-size: 1.8rem;
   width: 30rem;
   border-radius: 0.7rem;
-  margin: 0 3rem;
+  margin: 0 2rem;
   /* overflow: hidden; */
 }
 
@@ -98,34 +98,28 @@ body {
   font-size: 2.4rem;
 }
 
-.btn-country {
-  border: none;
-  font-size: 2rem;
-  padding: 2rem 5rem;
-  border-radius: 0.7rem;
-  color: white;
-  background-color: orangered;
-  cursor: pointer;
-}
-
-.images {
-  display: flex;
-}
-
-.images img {
-  display: block;
-  width: 80rem;
-  margin: 4rem;
-}
-
-.images img.parallel {
-  width: 40rem;
-  margin: 2rem;
-  border: 3rem solid white;
-  box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
-}
-
 #city {
   margin-top: 2rem;
   font-size: 2rem;
+}
+
+@media (max-width: 600px) {
+  .countries {
+    display: initial;
+    font-size: 2rem;
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  .neighbour {
+    transform: scale(0.8) translateY(1rem);
+    margin-left: 1.5rem;
+  }
+
+  #city {
+    /* text-align: center; */
+    /* margin-right: 6rem; */
+    margin-top: 0;
+    height: 10vh;
+  }
 }

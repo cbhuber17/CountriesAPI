@@ -1,7 +1,7 @@
 'use strict';
 
-const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
+const cityContainer = document.getElementById('city');
 
 // ----------------------------------------------------------------------
 
@@ -33,45 +33,63 @@ const renderError = function (msg) {
 
 // ----------------------------------------------------------------------
 
-const getJSON = function (url, errorMsg = 'Something went wrong') {
-  return fetch(url).then(response => {
-    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
-
-    return response.json();
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
 
 // ----------------------------------------------------------------------
 
-const getCountryData = function (country) {
-  // Country 1
-  getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
-    .then(data => {
-      renderCountry(data[0]);
-      const neighbour = data[0].borders[0];
-      console.log(neighbour);
+const whereAmI = async function () {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-      if (!neighbour) throw new Error('No neighbour found!');
-
-      // Country 2
-      return getJSON(
-        `https://restcountries.com/v2/alpha/${neighbour}`,
-        'Country not found'
+    // Reverse geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    if (!resGeo.ok)
+      throw new Error(
+        'Problem getting location data. Refresh the page and try again.'
       );
-    })
+    const dataGeo = await resGeo.json();
 
-    .then(data => renderCountry(data, 'neighbour'))
-    .catch(err => {
-      console.error(`${err} 💥💥💥`);
-      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
+    // Country data
+    const res = await fetch(
+      `https://restcountries.com/v2/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error('Problem getting country');
+    const data = await res.json();
+    renderCountry(data[0]);
+
+    // Neighbouring country data
+    const neighbour = data[0].borders[0];
+
+    if (!neighbour) throw new Error('No neighbour found!');
+
+    const neighborCountry = await fetch(
+      `https://restcountries.com/v2/alpha/${neighbour}`
+    );
+
+    if (!neighborCountry.ok) throw new Error('Neighbor country not found');
+    const neighborData = await neighborCountry.json();
+
+    renderCountry(neighborData, 'neighbour');
+
+    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+  } catch (err) {
+    console.error(`${err} 💥`);
+    renderError(`💥 ${err.message}`);
+
+    // Reject promise returned from async function
+    throw err;
+  }
 };
 
 // ----------------------------------------------------------------------
 
-btn.addEventListener('click', function () {
-  getCountryData('Vietnam');
-});
+whereAmI()
+  .then(city => (cityContainer.innerHTML = city))
+  .catch(err => console.log(err.message))
+  .finally(console.log('Got city.'));

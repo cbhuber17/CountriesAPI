@@ -48,7 +48,9 @@ const whereAmI = async function () {
     const { latitude: lat, longitude: lng } = pos.coords;
 
     // Reverse geocoding
-    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    const resGeo = await fetch(
+      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=${process.env[GEO_XYZ_API_KEY]}`
+    );
     if (!resGeo.ok)
       throw new Error(
         'Problem getting location data. Refresh the page and try again.'

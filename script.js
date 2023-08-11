@@ -49,7 +49,7 @@ const whereAmI = async function () {
 
     // Reverse geocoding
     const resGeo = await fetch(
-      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=${process.env[GEO_XYZ_API_KEY]}`
+      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=670566902046970533759x85278`
     );
     if (!resGeo.ok)
       throw new Error(

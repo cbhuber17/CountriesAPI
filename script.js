@@ -66,9 +66,11 @@ const whereAmI = async function () {
     renderCountry(data[0]);
 
     // Neighbouring country data
-    const neighbour = data[0].borders[0];
+    let neighbour = data[0]?.borders;
 
-    if (!neighbour) throw new Error('No neighbour found!');
+    if (!neighbour) return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+
+    neighbour = data[0]?.borders[0];
 
     const neighborCountry = await fetch(
       `https://restcountries.com/v2/alpha/${neighbour}`
